@@ -27,13 +27,15 @@ private:
 	string type;
 
 public:
-	Hand(string c, int b) {
-		cards = c;
-		bid = b;
+	Hand(string c, int b): cards(c), bid(b), type("") {
+		
+		//sort cards but keep original sequence
 		string temp1 = cards;
 		sort(temp1.begin(), temp1.end());
-		int n = 1;
-		string s = "";
+
+		
+
+		//remove jokers
 		string temp = "";
 		int aantal_jokers = 0;
 		for (int i = 0; i < 5; i++) {
@@ -44,43 +46,41 @@ public:
 				temp += temp1[i];
 			}
 		}
+
+		//calculate type
+		int n = 1;
 		if (aantal_jokers < 3) {
 			for (int i = 0; i < temp.size() - 2; i++) {
 				if (temp[i] == temp[i + 1])
 					n++;
 				else {
-					s += char(n) + '0';
+					type += char(n) + '0';
 					n = 1;
 				}
 			}
 			if (temp[temp.size() - 2] == temp[temp.size() - 1]) {
 				n++;
-				s += char(n) + '0';
+				type += char(n) + '0';
 			}
 			else {
-				s += char(n) + '0';
-				s += '1';
+				type += char(n) + '0';
+				type += '1';
 			}
-			sort(s.begin(), s.end());
-			string t = "";
-			for (int i = 0; i < s.size(); i++)
-				t = s[i] + t;
-			t[0] += aantal_jokers;
-			s = t;
+			sort(type.begin(), type.end(), [](int a, int b) {return a > b; });
+			
+			type[0] += aantal_jokers;
 		}
 		if (aantal_jokers == 3) {
 			if (temp[0] == temp[1]) {
-				s = "5";
+				type = "5";
 			}
 			else {
-				s = "41";
+				type = "41";
 			}
 		}
 		if (aantal_jokers >= 4) {
-			s = "5";
+			type = "5";
 		}
-		type = s;
-		
 	}
 
 	int get_bid()const {
@@ -129,8 +129,6 @@ int main()
 	}
 	sort(hands.begin(), hands.end(), is_weaker_than);
 	cout << endl;
-	for (const Hand& h : hands)
-		cout << h << endl;
 
 	uint64_t winning_bid = 0;
 	for (int rank = 0; rank < hands.size(); rank++)

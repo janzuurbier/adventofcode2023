@@ -22,41 +22,38 @@ int strength(char ch) {
 
 class Hand {
 private:
-	string cards;
+	string cards; //e.g. "A2KKJ"
 	int bid;
-	string type;
+	string type; //"5", "41", "32", "311", "221", "2111", "11111"
 
 public:
-	Hand(string c, int b) {
-		cards = c;
-		bid = b;
+	Hand(string c, int b): cards(c), bid(b), type("") {
+
+		//sort cards but keep orignal sequence
 		string temp = cards;
 		sort(temp.begin(), temp.end());
+
+		//calculate type
 		int n = 1;
-		string s = "";
 		for (int i = 0; i < 3; i++) {
 			if (temp[i] == temp[i + 1])
 				n++;
 			else {
-				s += char(n) + '0';
+				type += char(n) + '0';
 				n = 1;
 			}
 		}
 		if (temp[3] == temp[4]) {
 			n++;
-			s += char(n) + '0';
+			type += char(n) + '0';
 		}
 		else {
-			s += char(n) + '0';
-			s += '1';
-		}
-			
-			
-		sort(s.begin(), s.end());
-		string t = "";
-		for (int i = 0; i < s.size(); i++)
-			t = s[i] + t;
-		type = t;
+			type += char(n) + '0';
+			type += '1';
+		}		
+		
+		sort(type.begin(), type.end(), [](int a, int b) {return a > b; });
+		
 	}
 
 	int get_bid()const {
@@ -103,10 +100,11 @@ bool is_weaker_than(const Hand& a, const Hand& b) {
 		while (input >> cards >> bid) {
 			hands.push_back(Hand(cards, bid));
 		}
-		sort(hands.begin(), hands.end(), is_weaker_than);
-		cout << endl;
 		for (const Hand& h : hands)
 			cout << h << endl;
+
+		sort(hands.begin(), hands.end(), is_weaker_than);
+		
 
 		uint64_t winning_bid = 0;
 		for (int rank = 0; rank < hands.size(); rank++)
