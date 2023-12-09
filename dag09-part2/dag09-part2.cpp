@@ -9,11 +9,10 @@
 #include <deque>
 using namespace std;
 
-deque<int> reduce(const deque<int>& v) {
-	deque<int> w;
-	for (int i = 1; i < v.size(); i++)
-		w.push_back(v[i] - v[i - 1]);
-	return w;
+void reduce(deque<int>& v) {
+	for (int i = 0; i < v.size() - 1; i++)
+		v[i] = v[i + 1] - v[i];
+	v.pop_back();
 }
 
 bool is_all_zero(const deque<int>& v) {
@@ -48,7 +47,7 @@ int main()
 		while (!is_all_zero(v)) {
 			int first = v.front();
 			first_values.push_back(first);
-			v = reduce(v);
+			reduce(v);
 		}
 		int x = 0;
 		for (int i = first_values.size() - 1; i >= 0; i--) {

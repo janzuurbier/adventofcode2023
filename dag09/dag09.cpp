@@ -8,11 +8,10 @@
 #include <sstream>
 using namespace std;
 
-vector<int> reduce(const vector<int>& v) {
-	vector<int> w;
-	for (int i = 1; i < v.size(); i++)
-		w.push_back(v[i] - v[i - 1]);
-	return w;
+void reduce(vector<int>& v) {
+	for (int i = 0; i < v.size() - 1; i++)
+		v[i] = v[i+1] - v[i];
+	v.pop_back();
 }
 
 bool is_all_zero(const vector<int>& v) {
@@ -46,7 +45,7 @@ int main()
 		while (!is_all_zero(v)) {
 			int last = v.back();
 			last_values.push_back(last);
-			v = reduce(v);
+			reduce(v);
 		}
 	}
 
