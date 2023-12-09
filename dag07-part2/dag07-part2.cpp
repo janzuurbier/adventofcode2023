@@ -29,11 +29,10 @@ private:
 public:
 	Hand(string c, int b): cards(c), bid(b), type("") {
 		
-		//sort cards but keep original sequence
+		//sort cards (but keep original sequence)
+		//in order to group cards with the same strength
 		string temp1 = cards;
 		sort(temp1.begin(), temp1.end());
-
-		
 
 		//remove jokers
 		string temp = "";
@@ -47,7 +46,7 @@ public:
 			}
 		}
 
-		//calculate type
+		//calculate type by counting the number of each group
 		int n = 1;
 		if (aantal_jokers < 3) {
 			for (int i = 0; i < temp.size() - 2; i++) {
@@ -66,8 +65,9 @@ public:
 				type += char(n) + '0';
 				type += '1';
 			}
+			//largest number comes first
 			sort(type.begin(), type.end(), [](int a, int b) {return a > b; });
-			
+			//add jokers to largest group
 			type[0] += aantal_jokers;
 		}
 		if (aantal_jokers == 3) {
@@ -88,10 +88,7 @@ public:
 	}
 
 	friend bool is_weaker_than(const Hand& a, const Hand& b);
-
 	friend ostream& operator<<(ostream& os, const Hand& h);
-
-
 };
 
 ostream&  operator<<(ostream& os, const Hand& h) {
@@ -128,11 +125,9 @@ int main()
 		hands.push_back(Hand(cards, bid));
 	}
 	sort(hands.begin(), hands.end(), is_weaker_than);
-	cout << endl;
 
 	uint64_t winning_bid = 0;
 	for (int rank = 0; rank < hands.size(); rank++)
 		winning_bid += (rank + 1) * hands[rank].get_bid();
 	cout << winning_bid << endl;
-
 }

@@ -29,11 +29,12 @@ private:
 public:
 	Hand(string c, int b): cards(c), bid(b), type("") {
 
-		//sort cards but keep orignal sequence
+		//sort cards (but keep orignal sequence)
+		//in orde to group cards with the same strengh
 		string temp = cards;
 		sort(temp.begin(), temp.end());
 
-		//calculate type
+		//calculate type by counting number of cards of each strength
 		int n = 1;
 		for (int i = 0; i < 3; i++) {
 			if (temp[i] == temp[i + 1])
@@ -52,8 +53,8 @@ public:
 			type += '1';
 		}		
 		
+		//largest number comes first
 		sort(type.begin(), type.end(), [](int a, int b) {return a > b; });
-		
 	}
 
 	int get_bid()const {
@@ -61,10 +62,7 @@ public:
 	}
 
 	friend bool is_weaker_than(const Hand& a, const Hand& b);
-
 	friend ostream& operator<<(ostream& os, const Hand& h);
-
-
 };
 
 ostream&  operator<<(ostream& os, const Hand& h) {
@@ -86,29 +84,26 @@ bool is_weaker_than(const Hand& a, const Hand& b) {
 	return false;
 }
 
-	int main()
-	{
-		ifstream input("C:\\Users\\Jan\\Desktop\\input.txt");
-		if (!input) {
-			cout << "file not found" << endl;
-			return 1;
-		}
-
-		vector<Hand> hands;
-		string cards;
-		int bid;
-		while (input >> cards >> bid) {
-			hands.push_back(Hand(cards, bid));
-		}
-		for (const Hand& h : hands)
-			cout << h << endl;
-
-		sort(hands.begin(), hands.end(), is_weaker_than);
-		
-
-		uint64_t winning_bid = 0;
-		for (int rank = 0; rank < hands.size(); rank++)
-			winning_bid += (rank+1) * hands[rank].get_bid();
-		cout << winning_bid << endl;
-
+int main(){
+	ifstream input("C:\\Users\\Jan\\Desktop\\input.txt");
+	if (!input) {
+		cout << "file not found" << endl;
+		return 1;
 	}
+
+	vector<Hand> hands;
+	string cards;
+	int bid;
+	while (input >> cards >> bid) {
+		hands.push_back(Hand(cards, bid));
+	}
+	for (const Hand& h : hands)
+		cout << h << endl;
+
+	sort(hands.begin(), hands.end(), is_weaker_than);	
+
+	uint64_t winning_bid = 0;
+	for (int rank = 0; rank < hands.size(); rank++)
+		winning_bid += (rank+1) * hands[rank].get_bid();
+	cout << winning_bid << endl;
+}

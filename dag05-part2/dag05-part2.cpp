@@ -32,8 +32,7 @@ transformation_map read_map(ifstream& in) {
 	return tm;
 }
 
-
-vector<int64_t> transform(vector<int64_t> ranges, transformation_map tm) {
+vector<int64_t> transform(const vector<int64_t>& ranges, const transformation_map& tm) {
 	vector<int64_t> splitranges;
 	for (int i = 0; i < ranges.size(); i += 2) {
 		int64_t start = ranges[i];
@@ -119,17 +118,14 @@ int main()
 
 	
 	vector<int64_t> v = ranges;
-	for (transformation_map tm : ms) {
+	for (const transformation_map& tm : ms) {
 		v = transform(v, tm);
-		//for (int i = 0; i < v.size(); i += 2)
-		//	cout << v[i] << "\t\t" << v[i + 1] << endl;
-		//cout << endl;
 	}
 	
 	int64_t min = INT64_MAX;
 	for (int i = 0; i < v.size(); i += 2 )
 		if (v[i] < min) min = v[i];
 
-	cout << ">>>>" << min << endl;
+	cout  << min << endl;
 	return 0;
 }
