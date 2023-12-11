@@ -53,6 +53,7 @@ int main()
 		}
 		cout << totalsteps << " steps to reach " << node << endl;
 		int m = n;
+		string end_node = node;
 		totalsteps = 0;
 		while (true) {
 			char instruction = instructions[n];
@@ -63,7 +64,7 @@ int main()
 			n++;
 			if (n == instructions.size())n = 0;
 			totalsteps++;
-			if (node[2] == 'Z' && n == m)
+			if (node == end_node && n == m)
 				break;
 		}
 		cout << "to reach te same situation again: " << totalsteps << " steps" << endl;
