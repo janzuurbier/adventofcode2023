@@ -1,52 +1,44 @@
 // dag10-part2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-//#include <iostream>
+#include <iostream>
 #include <string>
 #include <fstream>
 #include "../matrix/matrix.h"
 using namespace std;
-//const int ROWS = 10;
-//const int COLS = 20;
+
 const int ROWS = 140;
 const int COLS = 140;
 
-matrix<char, ROWS, COLS> m('.');
-matrix<char, ROWS, COLS> n('.');
+matrix<char, ROWS, COLS> m('.'); //inputmatrix
+matrix<char, ROWS, COLS> n('.');//copy of inputmatrix that only contains the loop
 
-//only matrix n will marked
-void mark_A(int r, int k) {
+//mark cells in matrix n
+//this function is used in the algoritm below
+//cells next to and on the left side of the loop wil be marked
+void mark(int r, int k) {
 	if (n.isInRange(r, k) && n[r][k] == '.') n[r][k] = 'A';
 }
 
-void mark_B(int r, int k) {
-	if (n.isInRange(r, k) && n[r][k] == '.') n[r][k] = 'B';
-}
-
-void fill_points() {
+//after the algoritm is ready
+//the whole left side of the loop will me marked
+//and not just the cells next to the loop
+//wether this is the inside or the outside is not het known then
+void floodfill() {
 	for (int i = 0; i < COLS; i++)
 		for (int j = 0; j < ROWS; j++) {
 			if (n[j][i] == 'A') {
-				mark_A(j, i + 1);
-				mark_A(j + 1, i);
-			}
-			if (n[j][i] == 'B') {
-				mark_B(j, i + 1);
-				mark_B(j + 1, i);
+				mark(j, i + 1);
+				mark(j + 1, i);
 			}
 		}
 	for (int i = COLS-1; i >= 0; i--)
 		for (int j = ROWS - 1; j >= 0; j--) {
 			if (n[j][i] == 'A') {
-				mark_A(j - 1, i);
-				mark_A(j, i - 1);
-			}
-			if (n[j][i] == 'B') {
-				mark_B(j - 1, i);
-				mark_B(j, i - 1);
+				mark(j - 1, i);
+				mark(j, i - 1);
 			}
 		}
-
 }
 
 int main()
@@ -60,6 +52,7 @@ int main()
 
 	input >> m;
 
+	//find start
 	int start_row = 0, start_col = 0;
 	for (int i = 0; i < COLS; i++)
 		for (int j = 0; j < ROWS; j++)
@@ -70,10 +63,12 @@ int main()
 	int col = start_col;
 	int row = start_row;
 
-	n[row][col] = 'S';
+	n[row][col] = 'S'; //copy 'start' in matrix n
+
 	int length = 0;
 	int dir_x = 0, dir_y = 0;
 
+	//find start diriection
 	if (m[row][col + 1] == '-' || m[row][col + 1] == '7' || m[row][col + 1] == 'J') {
 		dir_x = 1;
 		dir_y = 0;
@@ -90,13 +85,15 @@ int main()
 		dir_x = 0;
 		dir_y = -1;
 	}
+	//move in that direction
 	col += dir_x;
 	row += dir_y;
 	int start_dir_x = dir_x;
 	int start_dir_y = dir_y;
 	
 	while (col != start_col || row != start_row) {
-		n[row][col] = m[row][col];
+		n[row][col] = m[row][col]; //copy element of the loop to matrix n
+		//find next dir
 		switch (m[row][col]) {
 		case '-':  break;
 		case '|':  break;
@@ -141,107 +138,99 @@ int main()
 			}
 			break;
 		}
-		
+		//move
 		col += dir_x;
 		row += dir_y;
 		length++;
 	}
 	cout << "lengte van het pad = " << length + 1 << endl;
 
-	//matrix n only contains path
+	//walk through matrix n and mark cells next to the path on the left side of the path
 	row = start_row;
 	col = start_col;
 	dir_x = start_dir_x;
 	dir_y = start_dir_y;
 	row += dir_y;
 	col += dir_x;
-	
 	while (col != start_col || row != start_row) {
-		n[row][col] = m[row][col];
 		switch (n[row][col]) {
 		case '-':
 			if (dir_x == 1) {
-				mark_A(row - 1, col); mark_B(row + 1, col); 
+				mark(row - 1, col); 
 			}
 			else {
-				mark_A(row + 1, col); mark_B(row - 1, col); 
+				mark(row + 1, col);  
 			}
 			break;
 		case '|': 
 			if (dir_y == 1)
 			{
-				mark_A(row, col + 1); mark_B(row , col - 1);
+				mark(row, col + 1); 
 			}
 			else
 			{
-				mark_A(row , col - 1); mark_B(row , col + 1);
+				mark(row , col - 1); 
 			}
 			break;
 		case '7':
 			if (dir_x == 1 && dir_y == 0) {
 				dir_x = 0;
 				dir_y = 1;
-				mark_A(row - 1, col); mark_A(row, col + 1);
+				mark(row - 1, col); mark(row, col + 1);
 			}
 			else if (dir_x == 0 && dir_y == -1) {
 				dir_x = -1;
 				dir_y = 0;
-				mark_B(row, col + 1); mark_B(row - 1, col);
 			}
 			break;
 		case 'J':
 			if (dir_x == 0 && dir_y == 1) {
-				mark_A(row, col + 1); mark_A(row + 1, col);
+				mark(row, col + 1); mark(row + 1, col);
 				dir_x = -1;
 				dir_y = 0;
 			}
 			else if (dir_x == 1 && dir_y == 0) {
 				dir_x = 0;
 				dir_y = -1;
-				mark_B(row + 1, col); mark_B(row, col + 1);
 			}
 			break;
 		case 'F':
 			if (dir_x == 0 && dir_y == -1) {
 				dir_x = 1;
 				dir_y = 0;
-				mark_A(row, col - 1); mark_A(row - 1, col);
+				mark(row, col - 1); mark(row - 1, col);
 			}
 			else if (dir_x == -1 && dir_y == 0) {
 				dir_x = 0;
 				dir_y = 1;
-				mark_B(row - 1, col); mark_B(row, col - 1);
 			}
 			break;
 		case 'L':
 			if (dir_x == 0 && dir_y == 1) {
 				dir_x = 1;
 				dir_y = 0;
-				mark_B(row, col - 1); mark_B(row + 1, col);
 			}
 			else if (dir_x == -1 && dir_y == 0) {
 				dir_x = 0;
 				dir_y = -1;
-				mark_A(row + 1, col); mark_A(row, col - 1);
+				mark(row + 1, col); mark(row, col - 1);
 			}
 			break;
 		}
-		
 		col += dir_x;
-		row += dir_y;
-			
+		row += dir_y;	
 	}
 
-	fill_points();
-	int countB = 0;
-	int countA = 0;
+	floodfill();
+	int count_unmarked = 0;
+	int count_marked = 0;
 	for (int i = 0; i < COLS; i++)
 		for (int j = 0; j < ROWS; j++) {
-			if (n[j][i] == 'B') countB++;
-			if (n[j][i] == 'A') countA++;
+			if (n[j][i] == '.') count_unmarked++;
+			if (n[j][i] == 'A') count_marked++;
 		}
 	
 	output << n << endl;
-	cout << "A: " << countA << " B: " << countB << endl;
-	cout << "look in output.txt wether A or B is inside the loop" << endl;
+	cout << "marked: " << count_marked << " unmarked: " << count_unmarked << endl;
+	cout << "look in output.txt wether marked points are inside or outside the loop" << endl;
 }
