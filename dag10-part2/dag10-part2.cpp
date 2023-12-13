@@ -1,6 +1,15 @@
 // dag10-part2.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+/*
+Walk the loop en copy the loop-cells to a new matrix.
+Walk the loop in the new matrix and mark cells left of the path
+Those are either on inside or outside.
+Floodfill the area and count the number of marked cells.
+Maybe it is the outside area that is marked and not the inside area.
+Then count cells that are neither marked nor on the path.
+*/
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -14,16 +23,10 @@ matrix<char, ROWS, COLS> m('.'); //inputmatrix
 matrix<char, ROWS, COLS> n('.');//copy of inputmatrix that only contains the loop
 
 //mark cells in matrix n
-//this function is used in the algoritm below
-//cells next to and on the left side of the loop wil be marked
 void mark(int r, int k) {
 	if (n.isInRange(r, k) && n[r][k] == '.') n[r][k] = 'A';
 }
 
-//after the algoritm is ready
-//the whole left side of the loop will me marked
-//and not just the cells next to the loop
-//wether this is the inside or the outside is not het known then
 void floodfill() {
 	for (int i = 0; i < COLS; i++)
 		for (int j = 0; j < ROWS; j++) {
@@ -92,7 +95,8 @@ int main()
 	int start_dir_y = dir_y;
 	
 	while (col != start_col || row != start_row) {
-		n[row][col] = m[row][col]; //copy element of the loop to matrix n
+		//copy element of the loop to matrix n
+		n[row][col] = m[row][col]; 
 		//find next dir
 		switch (m[row][col]) {
 		case '-':  break;
@@ -219,7 +223,7 @@ int main()
 		}
 		col += dir_x;
 		row += dir_y;	
-	}
+	}//while
 
 	floodfill();
 	int count_unmarked = 0;
