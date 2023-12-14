@@ -23,6 +23,7 @@ deque<int> split(string& s) {
 	return v;
 }
 
+//can you place 'aantal' # from position 'start'
 bool fits_here(const string& s, int aantal, size_t start) {
 	if (aantal == 0) return false;
 	if (start >= s.size()) return false;
@@ -39,7 +40,8 @@ bool fits_here(const string& s, int aantal, size_t start) {
 	return false;
 }
 
-size_t find_with_joker(const string& s, int aantal, size_t start = 0) {
+//find a position where you can place 'aantal' #.
+size_t find(const string& s, int aantal, size_t start = 0) {
 	while (start <= s.size() - aantal) {
 		if (fits_here(s, aantal, start))
 			return start;
@@ -48,10 +50,13 @@ size_t find_with_joker(const string& s, int aantal, size_t start = 0) {
 	return string::npos;
 }
 
-// a new recursive formula that uses multiplication rather than addition
+// a new recursive funtion that uses multiplication and addition
+// in part one I only used addition
 // it splits the string in two parts rather than eating from the front
-// it is much faster but still needs a couple of hours to finish with input for part2
-// also  a 64-bit integer is needed
+// recursively call de funtion  on both parts
+// it is important to calculate te shortest part first
+// because if it is zero you don't have to calculate the other part
+
 uint64_t count(string s, deque<int> v) {
 	int aantal_vraagtekens = 0;
 	int aantal_hekjes_reeds_aanwezig = 0;
@@ -90,17 +95,24 @@ uint64_t count(string s, deque<int> v) {
 	uint64_t sum = 0;
 	uint64_t left_val = 0;
 	uint64_t right_val = 0;
-	int old_pos = 0;
+	int old_pos = -1;
 	while (true) {
-		size_t pos = find_with_joker(s, max, old_pos);
+		size_t pos = find(s, max, old_pos + 1);
 		if (pos == string::npos)
 			break;
-		old_pos = pos + 1;
+		old_pos = pos;
 		string left = pos > 0 ? s.substr(0, pos - 1) : "";
 		string right = pos + max + 1 < s.size() ? s.substr(pos + max + 1) : "";
-		left_val = count(left, w);
-		if (left_val > 0)
+		if (pos < s.size() / 2) {
+			left_val = count(left, w);
+			if (left_val > 0)
+				right_val = count(right, v);
+		}
+		else {
 			right_val = count(right, v);
+			if (right_val > 0)
+				left_val = count(left, w);
+		}
 		sum += left_val * right_val;
 	}
 	return sum;
