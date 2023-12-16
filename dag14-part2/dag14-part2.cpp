@@ -51,29 +51,20 @@ int main()
 	
 	input >> m;
 
-
 	for (int i = 1; i < 100; i++) {
 		cycle(m);
-
-		int sum = 0;
-		for (int i = 0; i < ROWS; i++)
-			for (int j = 0; j < COLS; j++) {
-				if (m[i][j] == 'O')
-					sum += (ROWS - i);
-			}
 	}
+
 	cout << "find a repetiton in the following numbers " << endl;
 	for (int i = 100; i < 150; i++) {
-		cout << "after " << i << " cycles:\t";
 		cycle(m);
-
 		int sum = 0;
 		for (int i = 0; i < ROWS; i++)
 			for (int j = 0; j < COLS; j++) {
 				if (m[i][j] == 'O')
 					sum += (ROWS - i);
 			}
-		cout  << sum << endl ;
+		cout << "after " << i << " cycles:\t" << sum << endl ;
 	}
 }
 
