@@ -168,7 +168,6 @@ int main()
 				if (!history[i][j].empty())
 					aantal++;
 		if (aantal > max_aantal) max_aantal = aantal;
-		//cout << aantal << endl;
 	}
 	cout << ">>>>>>" << max_aantal << endl;
 }
