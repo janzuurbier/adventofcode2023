@@ -1,5 +1,3 @@
-// dag20.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include <iostream>
 #include <string>
@@ -11,13 +9,13 @@
 using namespace std;
 
 struct signal {
-	bool is_high;  
+	bool is_high;
 	string from;
 	string to;
 
 	signal(bool b, string f, string t) : is_high(b), from(f), to(t) {}
 
-	friend ostream& operator<<(ostream& os, const signal& s){
+	friend ostream& operator<<(ostream& os, const signal& s) {
 		os << s.from << (s.is_high ? " -high -> " : " -low -> ") << s.to;
 		return os;
 	}
@@ -38,24 +36,24 @@ public:
 			os << s << ", ";
 		return os;
 	}
-	
+
 };
 
 class flipflop : public module {
 	bool is_on = false; //true is on, false is off
-	 
+
 
 	void handle_pulse(signal s) {
 		if (!s.is_high) {
 			is_on = !is_on;
-			send();		
+			send();
 		}
 	}
 
 	void send() {
 		for (string dest : destination_modules)
 			thequeue.push_back(signal(is_on, name, dest));
-	}	
+	}
 };
 
 class conjunctionn : public module {
@@ -129,7 +127,7 @@ int main()
 		while (iss >> s) {
 			if (s.back() == ',')
 				s.pop_back();
-				m->destination_modules.push_back(s);
+			m->destination_modules.push_back(s);
 		}
 		modules[m->name] = m;
 	}
@@ -139,26 +137,21 @@ int main()
 			if (modules.count(s) > 0)
 				modules[s]->add_reciever(it->first);
 
-	int64_t count_low = 0;
-	int64_t count_high = 0;
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10000; i++) {
 		thequeue.push_back(signal(false, "button", "broadcaster"));
 		while (!thequeue.empty()) {
 			signal s = thequeue.front();
-			if (s.is_high)
-				count_high++;
-			else
-				count_low++;
+			if (s.to == "nr" && s.is_high) {
+				cout << "after " << i + 1 << " presses " << "nr recieves ";
+				cout << "high" << " from " << s.from << endl;
+			}
 			thequeue.pop_front();
 			//cout << s << endl;
-			if (modules.count(s.to) > 0 ){
+			if (modules.count(s.to) > 0) {
 				module* dest = modules[s.to];
 				dest->handle_pulse(s);
 			}
 		}
-		
-	}
-	cout << count_high << " " << count_low << " " << count_high * count_low << endl;
 
-	
+	}
 }
